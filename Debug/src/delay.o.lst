@@ -1,0 +1,231 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"delay.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.text.delayInit,"ax",%progbits
+  19              		.align	2
+  20              		.global	delayInit
+  21              		.thumb
+  22              		.thumb_func
+  24              	delayInit:
+  25              	.LFB56:
+  26              		.file 1 "../src/delay.c"
+   1:../src/delay.c **** #include "stm32f10x.h"
+   2:../src/delay.c **** #include "delay.h"
+   3:../src/delay.c **** 
+   4:../src/delay.c **** void delayInit() {
+  27              		.loc 1 4 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 1, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  32 0000 80B4     		push	{r7}
+  33              		.cfi_def_cfa_offset 4
+  34              		.cfi_offset 7, -4
+  35 0002 00AF     		add	r7, sp, #0
+  36              		.cfi_def_cfa_register 7
+   5:../src/delay.c **** 	RCC->APB2ENR |= RCC_APB2ENR_TIM15EN;
+  37              		.loc 1 5 0
+  38 0004 4FF48053 		mov	r3, #4096
+  39 0008 C4F20203 		movt	r3, 16386
+  40 000c 4FF48052 		mov	r2, #4096
+  41 0010 C4F20202 		movt	r2, 16386
+  42 0014 9269     		ldr	r2, [r2, #24]
+  43 0016 42F48032 		orr	r2, r2, #65536
+  44 001a 9A61     		str	r2, [r3, #24]
+   6:../src/delay.c **** 	TIM15->PSC = (24000000 / 1000000) - 1;
+  45              		.loc 1 6 0
+  46 001c 4FF48043 		mov	r3, #16384
+  47 0020 C4F20103 		movt	r3, 16385
+  48 0024 1722     		movs	r2, #23
+  49 0026 1A85     		strh	r2, [r3, #40]	@ movhi
+   7:../src/delay.c **** 	TIM15->CR1 = TIM_CR1_OPM;
+  50              		.loc 1 7 0
+  51 0028 4FF48043 		mov	r3, #16384
+  52 002c C4F20103 		movt	r3, 16385
+  53 0030 0822     		movs	r2, #8
+  54 0032 1A80     		strh	r2, [r3]	@ movhi
+   8:../src/delay.c **** 	TIM15->EGR = TIM_EGR_UG;
+  55              		.loc 1 8 0
+  56 0034 4FF48043 		mov	r3, #16384
+  57 0038 C4F20103 		movt	r3, 16385
+  58 003c 0122     		movs	r2, #1
+  59 003e 9A82     		strh	r2, [r3, #20]	@ movhi
+   9:../src/delay.c **** }
+  60              		.loc 1 9 0
+  61 0040 BD46     		mov	sp, r7
+  62              		@ sp needed
+  63 0042 5DF8047B 		ldr	r7, [sp], #4
+  64 0046 7047     		bx	lr
+  65              		.cfi_endproc
+  66              	.LFE56:
+  68              		.section	.text.delayUs,"ax",%progbits
+  69              		.align	2
+  70              		.global	delayUs
+  71              		.thumb
+  72              		.thumb_func
+  74              	delayUs:
+  75              	.LFB57:
+  10:../src/delay.c **** 
+  11:../src/delay.c **** void delayUs(int us) {
+  76              		.loc 1 11 0
+  77              		.cfi_startproc
+  78              		@ args = 0, pretend = 0, frame = 8
+  79              		@ frame_needed = 1, uses_anonymous_args = 0
+  80              		@ link register save eliminated.
+  81 0000 80B4     		push	{r7}
+  82              		.cfi_def_cfa_offset 4
+  83              		.cfi_offset 7, -4
+  84 0002 83B0     		sub	sp, sp, #12
+  85              		.cfi_def_cfa_offset 16
+  86 0004 00AF     		add	r7, sp, #0
+  87              		.cfi_def_cfa_register 7
+  88 0006 7860     		str	r0, [r7, #4]
+  12:../src/delay.c **** 	TIM15->ARR = us;
+  89              		.loc 1 12 0
+  90 0008 4FF48043 		mov	r3, #16384
+  91 000c C4F20103 		movt	r3, 16385
+  92 0010 7A68     		ldr	r2, [r7, #4]
+  93 0012 92B2     		uxth	r2, r2
+  94 0014 9A85     		strh	r2, [r3, #44]	@ movhi
+  13:../src/delay.c **** 	TIM15->CR1 |= TIM_CR1_CEN;
+  95              		.loc 1 13 0
+  96 0016 4FF48043 		mov	r3, #16384
+  97 001a C4F20103 		movt	r3, 16385
+  98 001e 4FF48042 		mov	r2, #16384
+  99 0022 C4F20102 		movt	r2, 16385
+ 100 0026 1288     		ldrh	r2, [r2]	@ movhi
+ 101 0028 92B2     		uxth	r2, r2
+ 102 002a 42F00102 		orr	r2, r2, #1
+ 103 002e 92B2     		uxth	r2, r2
+ 104 0030 1A80     		strh	r2, [r3]	@ movhi
+  14:../src/delay.c **** 	while((TIM15->CR1 & TIM_CR1_CEN) != 0);
+ 105              		.loc 1 14 0
+ 106 0032 00BF     		nop
+ 107              	.L3:
+ 108              		.loc 1 14 0 is_stmt 0 discriminator 1
+ 109 0034 4FF48043 		mov	r3, #16384
+ 110 0038 C4F20103 		movt	r3, 16385
+ 111 003c 1B88     		ldrh	r3, [r3]	@ movhi
+ 112 003e 9BB2     		uxth	r3, r3
+ 113 0040 03F00103 		and	r3, r3, #1
+ 114 0044 002B     		cmp	r3, #0
+ 115 0046 F5D1     		bne	.L3
+  15:../src/delay.c **** }
+ 116              		.loc 1 15 0 is_stmt 1
+ 117 0048 0C37     		adds	r7, r7, #12
+ 118 004a BD46     		mov	sp, r7
+ 119              		@ sp needed
+ 120 004c 5DF8047B 		ldr	r7, [sp], #4
+ 121 0050 7047     		bx	lr
+ 122              		.cfi_endproc
+ 123              	.LFE57:
+ 125 0052 00BF     		.section	.text.delayMs,"ax",%progbits
+ 126              		.align	2
+ 127              		.global	delayMs
+ 128              		.thumb
+ 129              		.thumb_func
+ 131              	delayMs:
+ 132              	.LFB58:
+  16:../src/delay.c **** 
+  17:../src/delay.c **** void delayMs(int ms) {
+ 133              		.loc 1 17 0
+ 134              		.cfi_startproc
+ 135              		@ args = 0, pretend = 0, frame = 8
+ 136              		@ frame_needed = 1, uses_anonymous_args = 0
+ 137 0000 80B5     		push	{r7, lr}
+ 138              		.cfi_def_cfa_offset 8
+ 139              		.cfi_offset 7, -8
+ 140              		.cfi_offset 14, -4
+ 141 0002 82B0     		sub	sp, sp, #8
+ 142              		.cfi_def_cfa_offset 16
+ 143 0004 00AF     		add	r7, sp, #0
+ 144              		.cfi_def_cfa_register 7
+ 145 0006 7860     		str	r0, [r7, #4]
+  18:../src/delay.c **** 	while(ms--)
+ 146              		.loc 1 18 0
+ 147 0008 03E0     		b	.L5
+ 148              	.L6:
+  19:../src/delay.c **** 		delayUs(1000);
+ 149              		.loc 1 19 0
+ 150 000a 4FF47A70 		mov	r0, #1000
+ 151 000e FFF7FEFF 		bl	delayUs
+ 152              	.L5:
+  18:../src/delay.c **** 	while(ms--)
+ 153              		.loc 1 18 0 discriminator 1
+ 154 0012 7B68     		ldr	r3, [r7, #4]
+ 155 0014 5A1E     		subs	r2, r3, #1
+ 156 0016 7A60     		str	r2, [r7, #4]
+ 157 0018 002B     		cmp	r3, #0
+ 158 001a F6D1     		bne	.L6
+  20:../src/delay.c **** }
+ 159              		.loc 1 20 0
+ 160 001c 0837     		adds	r7, r7, #8
+ 161 001e BD46     		mov	sp, r7
+ 162              		@ sp needed
+ 163 0020 80BD     		pop	{r7, pc}
+ 164              		.cfi_endproc
+ 165              	.LFE58:
+ 167 0022 00BF     		.text
+ 168              	.Letext0:
+ 169              		.file 2 "c:\\program files (x86)\\mentorgraphics\\sourcery_codebench_lite_for_arm_eabi\\arm-none-e
+ 170              		.file 3 "D:\\workspace\\rfm12\\stm32_std\\CMSIS\\CM3\\DeviceSupport\\ST\\STM32F10x/stm32f10x.h"
+ 171              		.file 4 "D:\\workspace\\rfm12\\stm32_std\\CMSIS\\CM3\\CoreSupport/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 delay.c
+C:\Users\Serj\AppData\Local\Temp\ccgNbmUd.s:19     .text.delayInit:00000000 $t
+C:\Users\Serj\AppData\Local\Temp\ccgNbmUd.s:24     .text.delayInit:00000000 delayInit
+C:\Users\Serj\AppData\Local\Temp\ccgNbmUd.s:69     .text.delayUs:00000000 $t
+C:\Users\Serj\AppData\Local\Temp\ccgNbmUd.s:74     .text.delayUs:00000000 delayUs
+C:\Users\Serj\AppData\Local\Temp\ccgNbmUd.s:126    .text.delayMs:00000000 $t
+C:\Users\Serj\AppData\Local\Temp\ccgNbmUd.s:131    .text.delayMs:00000000 delayMs
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.69ef232822fae12fd5bc55108b75a1e4
+                           .group:00000000 wm4.stm32f10x.h.51.b859cb68ed44ee02c916b41cb8c68f1c
+                           .group:00000000 wm4.core_cm3.h.47.c45d264953076019d6b3b1c20e8ad771
+                           .group:00000000 wm4.newlib.h.8.384a112feabb3bef7b573ae48cde2e3b
+                           .group:00000000 wm4.features.h.22.6a4ca7cd053637cc1d0db6c16f39b2d7
+                           .group:00000000 wm4.config.h.183.aa62afef667fb61d15fa64c48beb2f14
+                           .group:00000000 wm4._ansi.h.23.2147fde150631f5584b9dc29b914d1b8
+                           .group:00000000 wm4.stdint.h.20.54ad762faa59e3c05491630641c8d8bf
+                           .group:00000000 wm4.core_cmInstr.h.39.3d3d1b4a79aef37532666dc6ee87c6ac
+                           .group:00000000 wm4.core_cm3.h.144.f4158be2ca5a330459fef4214a4bb0f1
+                           .group:00000000 wm4.stm32f10x.h.522.a925aafc848b1f088438cf0e9b167b78
+                           .group:00000000 wm4.stm32f10x_adc.h.83.4d35a50d598070ecea6f33bcef02c922
+                           .group:00000000 wm4.stm32f10x_bkp.h.25.4622919f1e30efdad5eb44e12edd5513
+                           .group:00000000 wm4.stm32f10x_can.h.25.48aab46fcce6d08400bf960b028e4698
+                           .group:00000000 wm4.stm32f10x_cec.h.25.8f03450e7bbb704d96e7bc73ec0f66a7
+                           .group:00000000 wm4.stm32f10x_dac.h.25.d946244edf026333094657d55ea894b8
+                           .group:00000000 wm4.stm32f10x_dbgmcu.h.25.d3351200fc7f9c8615d1ae81d40db08a
+                           .group:00000000 wm4.stm32f10x_dma.h.25.94e36204daa98cae5dcc70a10a9694d5
+                           .group:00000000 wm4.stm32f10x_exti.h.25.b9064155c5c006b5154b39788c79001a
+                           .group:00000000 wm4.stm32f10x_flash.h.25.4be61fcb02863962a1e006449d310650
+                           .group:00000000 wm4.stm32f10x_fsmc.h.25.bca154da2699cdb6024c0c6c4fc5aa89
+                           .group:00000000 wm4.stm32f10x_gpio.h.25.80c981af0e637567395034c576cfb3ce
+                           .group:00000000 wm4.stm32f10x_i2c.h.25.7b6cbaea24c6f25f538f8516d1814cb2
+                           .group:00000000 wm4.stm32f10x_iwdg.h.25.da9374ab9856795610487f312ccf3122
+                           .group:00000000 wm4.stm32f10x_pwr.h.25.37ef75009f751ef5fe27910e0bf00a62
+                           .group:00000000 wm4.stm32f10x_rcc.h.25.fe8897e7491f2eb0cff54551d08eb765
+                           .group:00000000 wm4.stm32f10x_rtc.h.25.361142606ba98ddcd10369f321f6e636
+                           .group:00000000 wm4.stm32f10x_sdio.h.25.1fb5280a7690ef99070096bf8c866b3a
+                           .group:00000000 wm4.stm32f10x_spi.h.25.68b3d5ccfcf895f9fe505ce20c0c300f
+                           .group:00000000 wm4.stm32f10x_tim.h.25.21c6ec062f1e74898cb96a57da276fec
+                           .group:00000000 wm4.stm32f10x_usart.h.25.29629c699b65db3f3efd3561f66b0bf6
+                           .group:00000000 wm4.stm32f10x_wwdg.h.25.dde12201d86b5aa9ecaafb5eccdc6549
+                           .group:00000000 wm4.misc.h.25.068e106f368fa5369a681ef57c106f4b
+                           .group:00000000 wm4.stm32f10x.h.8304.f7d8ad90959e99679b3257267c3aadfe
+
+NO UNDEFINED SYMBOLS
